@@ -1,6 +1,4 @@
-'use strict';
-
-const crypto = require('node:crypto');
+'use strict';const crypto = require('node:crypto');
 const { promisify } = require('node:util');
 const jwt = require('jsonwebtoken');
 const User = require('../models/userModel');
@@ -10,7 +8,6 @@ const emailTemplates = require('../utils/email');
 
 const AUTH_KEY = 'token';
 const { NODE_ENV, JWT_SECRET, JWT_EXPIRES } = process.env;
-const PROD_MODE = NODE_ENV === 'production';
 const JWT_EXPIRES_MS = parseInt(JWT_EXPIRES) * 24 * 60 * 60 * 1000;
 
 const signJWT = promisify(jwt.sign);
@@ -21,14 +18,13 @@ const signToken = (id) =>
     expiresIn: JWT_EXPIRES_MS,
   });
 
-const sendToken = async (user, statusCode, res) => {
+const sendToken = async (req, res, user, statusCode) => {
   const token = await signToken(user._id);
-  const cookieOptions = {
+  res.cookie(AUTH_KEY, token, {
     expires: new Date(Date.now() + JWT_EXPIRES_MS),
     httpOnly: true,
-  };
-  if (PROD_MODE) cookieOptions.secure = true;
-  res.cookie(AUTH_KEY, token, cookieOptions);
+    secure: req.secure || req.headers['x-forwarded-proto'] === 'https',
+  });
   user.password = undefined;
   res.status(statusCode).json({
     status: 'success',
@@ -48,7 +44,7 @@ const signup = catchAsync(async (req, res) => {
   });
   const url = `${req.protocol}://127.0.0.1:8000/account`;
   await emailTemplates.sendWelcome(user, url);
-  await sendToken(user, 201, res);
+  await sendToken(req, res, user, 201);
 });
 
 const login = catchAsync(async (req, res) => {
@@ -58,7 +54,7 @@ const login = catchAsync(async (req, res) => {
   const user = await User.findOne({ email }).select('+password');
   if (!user || !(await user.verifyPassword(password, user.password)))
     throw new AppError('Invalid email or password', 401);
-  await sendToken(user, 200, res);
+  await sendToken(req, res, user, 200);
 });
 
 const logout = catchAsync(async (req, res) => {
@@ -138,7 +134,7 @@ const resetPassword = catchAsync(async (req, res, next) => {
   user.passwordResetToken = undefined;
   user.passwordResetExpires = undefined;
   await user.save();
-  await sendToken(user, 200, res);
+  await sendToken(req, res, user, 200);
 });
 
 const changePassword = catchAsync(async (req, res) => {
@@ -152,7 +148,7 @@ const changePassword = catchAsync(async (req, res) => {
   user.password = password;
   user.passwordConfirm = passwordConfirm;
   await user.save();
-  await sendToken(user, 200, res);
+  await sendToken(req, res, user, 200);
 });
 
 const isLoggedIn = async (req, res, next) => {

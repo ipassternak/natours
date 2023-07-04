@@ -21,6 +21,8 @@ const errorController = require('./controllers/errorController');
 
 const app = express();
 
+app.enable('trust proxy');
+
 app.set('view engine', 'pug');
 app.set('views', path.join(process.cwd(), 'views'));
 app.use(express.static(path.join(process.cwd(), 'public')));
