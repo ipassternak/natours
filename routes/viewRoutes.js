@@ -1,11 +1,11 @@
 'use strict';
-
 const express = require('express');
 const {
   getOverview,
   getTour,
   getLoginForm,
   getAccount,
+  getAlert,
 } = require('../controllers/viewController');
 const { protect, isLoggedIn } = require('../controllers/authController');
 const {
@@ -14,6 +14,8 @@ const {
 } = require('../controllers/bookingController');
 
 const router = express.Router();
+
+router.use(getAlert);
 
 router.get('/account', protect, getAccount);
 router.get('/bookings', protect, getBookedTours);

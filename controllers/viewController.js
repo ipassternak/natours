@@ -1,5 +1,4 @@
 'use strict';
-
 const Tour = require('../models/tourModel');
 const catchAsync = require('../utils/catchAsync');
 const AppError = require('../utils/AppError');
@@ -31,9 +30,20 @@ const getAccount = (req, res) => {
   });
 };
 
+const PAGE_ALERTS = {
+  booking: 'Your booking was successful!',
+};
+
+const getAlert = (req, res, next) => {
+  const { alert } = req.query;
+  if (alert) res.locals.alert = PAGE_ALERTS[alert];
+  next();
+};
+
 module.exports = {
   getOverview,
   getTour,
   getLoginForm,
   getAccount,
+  getAlert,
 };
