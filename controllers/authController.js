@@ -1,4 +1,5 @@
-'use strict';const crypto = require('node:crypto');
+'use strict';
+const crypto = require('node:crypto');
 const { promisify } = require('node:util');
 const jwt = require('jsonwebtoken');
 const User = require('../models/userModel');
@@ -7,7 +8,7 @@ const AppError = require('../utils/AppError');
 const emailTemplates = require('../utils/email');
 
 const AUTH_KEY = 'token';
-const { NODE_ENV, JWT_SECRET, JWT_EXPIRES } = process.env;
+const { JWT_SECRET, JWT_EXPIRES } = process.env;
 const JWT_EXPIRES_MS = parseInt(JWT_EXPIRES) * 24 * 60 * 60 * 1000;
 
 const signJWT = promisify(jwt.sign);

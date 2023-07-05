@@ -1,6 +1,7 @@
 import { login, logout } from './login.js';
 import { updateProfile, changePassword } from './updateSettings.js';
 import { bookTour } from './stripe.js';
+import { displayAlert } from './alerts.js';
 import { displayMap } from './map.js';
 
 const loginForm = document.querySelector('.form--login');
@@ -16,6 +17,7 @@ const bookBtn = document.getElementById('book-tour');
 
 const logoutBtn = document.querySelector('.nav__el.nav__el--logout');
 const changePasswordBtn = document.querySelector('.btn-change-password');
+const alertMessage = document.querySelector('body').dataset.alert;
 const map = document.getElementById('map');
 
 if (loginForm) {
@@ -69,6 +71,8 @@ if (bookBtn) {
     bookBtn.textContent = 'Book tour now!';
   });
 }
+
+if (alertMessage) displayAlert('success', alertMessage);
 
 if (map) {
   const locations = JSON.parse(map.dataset.locations);

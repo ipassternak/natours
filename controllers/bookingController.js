@@ -1,5 +1,4 @@
 'use strict';
-
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 const Booking = require('../models/bookingModel');
 const Tour = require('../models/tourModel');
@@ -48,7 +47,7 @@ const createBookingCheckout = catchAsync(async (req, res, next) => {
   const { tour, user, price } = req.query;
   if (!tour || !user || !price) return next();
   await Booking.create({ tour, user, price });
-  res.redirect(req.originalUrl.split('?')[0]);
+  res.redirect('http://127.0.0.1:8000/bookings?alert=booking');
 });
 
 const getBookedTours = catchAsync(async (req, res) => {
