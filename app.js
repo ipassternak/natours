@@ -3,6 +3,7 @@
 const path = require('node:path');
 const express = require('express');
 const helmet = require('helmet');
+const cors = require('cors');
 const cookieParser = require('cookie-parser');
 const rateLimit = require('express-rate-limit');
 const mongoSanitize = require('express-mongo-sanitize');
@@ -32,6 +33,10 @@ const limiter = rateLimit({
   max: 100,
   message: 'The request limit from the current IP address has been reached',
 });
+
+app.use(cors());
+
+app.options('*', cors());
 
 app.use(limiter);
 app.use(
