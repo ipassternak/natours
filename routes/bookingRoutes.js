@@ -17,7 +17,7 @@ router.use(protect);
 
 router.get('/checkoutSession/:tourId', getCheckoutSession);
 
-router.use(restrictTo('lead-guide', 'admin'));
+router.use(restrictTo('admin'));
 
 router.route('/').get(getAllBookings).post(createBooking);
 router.route('/:id').get(getBooking).patch(updateBooking).delete(deleteBooking);

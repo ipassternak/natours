@@ -1,6 +1,8 @@
 'use strict';
+
 const crypto = require('node:crypto');
 const { promisify } = require('node:util');
+const ObjectId = require('mongoose').Types.ObjectId;
 const jwt = require('jsonwebtoken');
 const User = require('../models/userModel');
 const catchAsync = require('../utils/catchAsync');
@@ -86,15 +88,38 @@ const protect = catchAsync(async (req, res, next) => {
   next();
 });
 
+const PERMISSION_ERROR = new AppError(
+  'You do not have permission to perform this action',
+  403
+);
+
 const restrictTo =
   (...roles) =>
   (req, res, next) => {
-    if (!roles.includes(req.user.role))
-      next(
-        new AppError('You do not have permission to perform this action', 403)
-      );
-    next();
+    if (roles.includes(req.user.role)) next();
+    else next(PERMISSION_ERROR);
   };
+
+const checkId = (registered, candidate) => {
+  if (ObjectId.isValid(registered)) {
+    return registered.equals(candidate);
+  }
+  return registered._id.equals(candidate);
+};
+
+const restrictToOwner = (Model, ownerField) =>
+  catchAsync(async (req, res, next) => {
+    if (req.user.role === 'admin') return next();
+    const doc = await Model.findById(req.params.id);
+    if (doc) {
+      const { _id } = req.user;
+      const value = doc[ownerField];
+      const owners = Array.isArray(value) ? value : [value];
+      const isOwner = owners.some((owner) => checkId(owner, _id));
+      if (isOwner) return next();
+    }
+    next(PERMISSION_ERROR);
+  });
 
 const forgotPassword = catchAsync(async (req, res) => {
   const { email } = req.body;
@@ -170,6 +195,7 @@ module.exports = {
   logout,
   protect,
   restrictTo,
+  restrictToOwner,
   forgotPassword,
   resetPassword,
   changePassword,

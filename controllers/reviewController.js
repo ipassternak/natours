@@ -2,7 +2,7 @@
 
 const Review = require('../models/reviewModel');
 const ControllerFactory = require('./controllerFactory');
-const AppError = require('../utils/AppError');
+const { restrictToOwner } = require('./authController');
 
 const queryTourId = (req, res, next) => {
   const { tourId } = req.params;
@@ -16,15 +16,7 @@ const setReferenceIds = (req, res, next) => {
   next();
 };
 
-const checkReviewOwnership = async (req, res, next) => {
-  if (req.user.role === 'admin') return next();
-  const review = await Review.findById(req.params.id);
-  if (review && !review.user._id.equals(req.user._id))
-    next(
-      new AppError('You do not have permission to perform this action', 403)
-    );
-  next();
-};
+const checkReviewOwnership = restrictToOwner(Review, 'user');
 
 const reviewController = new ControllerFactory(Review);
 
