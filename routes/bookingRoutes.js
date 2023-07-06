@@ -10,8 +10,9 @@ const {
   getCheckoutSession,
 } = require('../controllers/bookingController');
 const { protect, restrictToRoles } = require('../controllers/authController');
+const queryNestedId = require('../utils/queryNestedId');
 
-const router = express.Router();
+const router = express.Router({ mergeParams: true });
 
 router.use(protect);
 
@@ -19,7 +20,7 @@ router.get('/checkoutSession/:tourId', getCheckoutSession);
 
 router.use(restrictToRoles('admin'));
 
-router.route('/').get(getAllBookings).post(createBooking);
+router.route('/').get(queryNestedId('tourId'), getAllBookings).post(createBooking);
 router.route('/:id').get(getBooking).patch(updateBooking).delete(deleteBooking);
 
 module.exports = router;

@@ -17,10 +17,12 @@ const {
 } = require('../controllers/tourController');
 const { protect, restrictToRoles } = require('../controllers/authController');
 const reviewRouter = require('./reviewRoutes');
+const bookingRouter = require('./bookingRoutes');
 
 const router = express.Router();
 
 router.use('/:tourId/reviews', reviewRouter);
+router.use('/:tourId/bookings', bookingRouter);
 
 router.route('/hot').get(aliasHotTours, getAllTours);
 router.get('/stats', getToursStats);

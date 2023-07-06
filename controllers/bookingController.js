@@ -51,7 +51,7 @@ const createBookingCheckout = catchAsync(async (req, res, next) => {
   res.redirect(`${req.protocol}://${req.get('host')}/bookings?alert=booking`);
 });
 
-const getBookedTours = catchAsync(async (req, res) => {
+const getAccountBookings = catchAsync(async (req, res) => {
   const { user } = req;
   const bookings = await Booking.find({ user: user._id });
   const tourIDs = bookings.map((booking) => booking.tour._id);
@@ -73,5 +73,5 @@ module.exports = {
   deleteBooking,
   getCheckoutSession,
   createBookingCheckout,
-  getBookedTours,
+  getAccountBookings,
 };
