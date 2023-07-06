@@ -1,16 +1,18 @@
-import axios from 'axios';
 import { displayAlert } from './alerts.js';
 
 const updateSettings = async (url, successMsg, data) => {
   try {
-    await axios({
+    const res = await fetch(url, {
       method: 'PATCH',
-      url,
-      data,
+      body: data,
     });
+    if (!res.ok) {
+      const body = await res.json();
+      throw new Error(body.message);
+    }
     displayAlert('success', successMsg);
   } catch (err) {
-    displayAlert('error', err.response.data.message);
+    displayAlert('error', err.message);
   }
 };
 

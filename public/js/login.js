@@ -1,28 +1,33 @@
-import axios from 'axios';
 import { displayAlert } from './alerts.js';
 
 export const login = async (email, password) => {
   try {
-    await axios({
+    const res = await fetch('/api/v1/users/login', {
       method: 'POST',
-      url: '/api/v1/users/login',
-      data: { email, password },
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ email, password }),
     });
+    if (!res.ok) {
+      const body = await res.json();
+      throw new Error(body.message);
+    }
     displayAlert('success', 'You are logged in successfully!');
-    window.setTimeout(() => {
-      location.assign('/');
+      window.setTimeout(() => {
+        location.assign('/');
     }, 750);
   } catch (err) {
-    displayAlert('error', err.response.data.message);
+    displayAlert('error', `Failed to log in. ${err.message}`);
   }
 };
 
 export const logout = async () => {
   try {
-    await axios({
+    const res = await fetch('/api/v1/users/logout', {
       method: 'GET',
-      url: '/api/v1/users/logout',
     });
+    if (!res.ok) throw new Error();
     if (location.pathname === '/account') location.assign('/');
     else location.reload(true);
   } catch (err) {

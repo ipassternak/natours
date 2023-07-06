@@ -1,6 +1,7 @@
 'use strict';
 
 const multer = require('multer');
+const AppError = require('./appError');
 
 const upload = multer({
   storage: multer.memoryStorage(),

@@ -1,4 +1,3 @@
-import axios from 'axios';
 import { displayAlert } from './alerts';
 
 const stripe = Stripe(
@@ -7,12 +6,12 @@ const stripe = Stripe(
 
 export const bookTour = async (tourId) => {
   try {
-    const { data } = await axios({
+    const res = await fetch(`/api/v1/bookings/checkoutSession/${tourId}`, {
       method: 'GET',
-      url: `/api/v1/bookings/checkoutSession/${tourId}`,
     });
+    const { session } = await res.json();
     await stripe.redirectToCheckout({
-      sessionId: data.session.id,
+      sessionId: session.id,
     });
   } catch (err) {
     displayAlert('error', err.message);
