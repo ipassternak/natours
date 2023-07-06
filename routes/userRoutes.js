@@ -17,7 +17,7 @@ const {
   login,
   logout,
   protect,
-  restrictTo,
+  restrictToRoles,
   forgotPassword,
   resetPassword,
   changePassword,
@@ -41,7 +41,7 @@ router
 
 router.patch('/account/changePassword', changePassword);
 
-router.use(restrictTo('admin'));
+router.use(restrictToRoles('admin'));
 
 router.route('/').get(getAllUsers);
 router.route('/:id').get(getUser).patch(updateUser).delete(deleteUser);

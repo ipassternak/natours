@@ -11,7 +11,7 @@ const DB = process.env.DB_TOKEN.replace('<password>', DB_PASSWORD);
 
 mongoose
   .connect(DB)
-  .then(() => console.log('Connected to database successfully'))
+  .then(() => console.log('Connected to database successfully!'))
   .catch((err) => {
     console.log(`Failed connection to database: ${err.message}`);
     console.log('Shutting down the aplication...');
@@ -19,7 +19,7 @@ mongoose
   });
 
 const server = app.listen(PORT, () => {
-  console.log(`Listening at http:/localhost:${PORT}`);
+  console.log(`Listening at http://localhost:${PORT}`);
 });
 
 ['SIGINT', 'SIGTERM'].forEach((signal) => {

@@ -6,6 +6,7 @@ const { htmlToText } = require('html-to-text');
 const nodemailer = require('nodemailer');
 const {
   NODE_ENV,
+  PASSWORD_EXPIRES_IN,
   EMAIL_HOST,
   EMAIL_PORT,
   EMAIL_USERNAME,
@@ -16,7 +17,7 @@ const {
 } = process.env;
 
 const transports = {
-  dev: nodemailer.createTransport({
+  development: nodemailer.createTransport({
     host: EMAIL_HOST,
     port: EMAIL_PORT,
     auth: {
@@ -56,7 +57,7 @@ const emailTemplates = {
   sendWelcome: createTemp('welcome', 'Welcome to the Natours!'),
   sendResetPassword: createTemp(
     'passwordReset',
-    'Your password reset token (valid for only 10 minutes)'
+    `Your password reset token (valid for only ${PASSWORD_EXPIRES_IN} minutes)`
   ),
 };
 

@@ -1,22 +1,13 @@
 'use strict';
 
 const path = require('node:path');
-const multer = require('multer');
 const sharp = require('sharp');
 const User = require('../models/userModel');
 const ControllerFactory = require('./controllerFactory');
+const upload = require('../utils/uploadImages');
 const catchAsync = require('../utils/catchAsync');
-const AppError = require('../utils/AppError');
 
 const USER_PHOTO_DIR = path.join(process.cwd(), 'public', 'img', 'users');
-
-const upload = multer({
-  storage: multer.memoryStorage(),
-  fileFilter: (req, file, cb) => {
-    if (file.mimetype.startsWith('image')) cb(null, true);
-    else cb(new AppError('The uploaded file is not an image', 400), false);
-  },
-});
 
 const uploadUserPhoto = upload.single('photo');
 

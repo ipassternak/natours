@@ -15,7 +15,7 @@ const {
   toursWithin,
   getDistances,
 } = require('../controllers/tourController');
-const { protect, restrictTo } = require('../controllers/authController');
+const { protect, restrictToRoles } = require('../controllers/authController');
 const reviewRouter = require('./reviewRoutes');
 
 const router = express.Router();
@@ -27,7 +27,7 @@ router.get('/stats', getToursStats);
 router.get(
   '/monthly-plan/:year',
   protect,
-  restrictTo('guide', 'lead-guide', 'admin'),
+  restrictToRoles('guide', 'lead-guide', 'admin'),
   getMonthlyPlan
 );
 
@@ -37,12 +37,12 @@ router.get('/distances/:coords/unit/:unit', getDistances);
 router
   .route('/')
   .get(getAllTours)
-  .post(protect, restrictTo('lead-guide', 'admin'), createTour);
+  .post(protect, restrictToRoles('lead-guide', 'admin'), createTour);
 
 router
   .route('/:id')
   .get(getTour)
-  .all(protect, restrictTo('lead-guide', 'admin'))
+  .all(protect, restrictToRoles('lead-guide', 'admin'))
   .patch(uploadTourImages, resizeTourImages, updateTour)
   .delete(deleteTour);
 

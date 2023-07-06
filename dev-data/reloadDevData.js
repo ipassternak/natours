@@ -11,7 +11,13 @@ const Review = require('../models/reviewModel');
 const Models = [Tour, User, Review];
 
 const args = process.argv;
-const { DB_PASSWORD } = process.env;
+const { NODE_ENV, DB_PASSWORD } = process.env;
+
+if (NODE_ENV !== 'development') {
+  console.log('(-) You are not in development mode!');
+  process.exit(1);
+}
+
 const DB = process.env.DB_TOKEN.replace('<password>', DB_PASSWORD);
 
 const CWD = process.cwd();
@@ -22,7 +28,7 @@ const DATA_PATHS = ['tours.json', 'users.json', 'reviews.json'].map((file) =>
 
 const deleteDevData = async () => {
   for (const Model of Models) await Model.deleteMany();
-  console.log('(+) All data has been successfully deleted from the database');
+  console.log('(+) All data has been successfully deleted from the database!');
 };
 
 const importDevData = async () => {
@@ -33,7 +39,7 @@ const importDevData = async () => {
     const data = JSON.parse(json);
     await Model.create(data, { validateBeforeSave: false });
   }
-  console.log('(+) All dev data has been successfully imported to database');
+  console.log('(+) All dev data has been successfully imported to database!');
 };
 
 const options = {
@@ -45,14 +51,14 @@ const options = {
   try {
     if (args.length > 2) {
       await mongoose.connect(DB);
-      console.log('(+) Successfully connected to database');
+      console.log('(+) Successfully connected to database!');
       for (const arg of args) {
         const option = options[arg];
         if (option) await option();
       }
-      console.log('(+) All the work is done');
+      console.log('(+) All the work is done!');
     } else {
-      console.log('(-) No work to do');
+      console.log('(-) No work to do!');
     }
     await mongoose.disconnect();
     process.exit(0);

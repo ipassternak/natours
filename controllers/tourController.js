@@ -1,23 +1,19 @@
 'use strict';
 
 const path = require('node:path');
-const multer = require('multer');
 const sharp = require('sharp');
 const Tour = require('../models/tourModel');
 const ControllerFactory = require('./controllerFactory');
+const upload = require('../utils/uploadImages');
 const catchAsync = require('../utils/catchAsync');
-const AppError = require('../utils/AppError');
-const MONTHS = require('../constants/months');
+const AppError = require('../utils/appError');
+const { 
+  MONTHS, 
+  EARTH_RADIUS, 
+  DISTANCE_TO_METERS 
+} = require('../constants/dataConstants');
 
 const TOUR_IMAGES_DIR = path.join(process.cwd(), 'public', 'img', 'tours');
-
-const upload = multer({
-  storage: multer.memoryStorage(),
-  fileFilter: (req, file, cb) => {
-    if (file.mimetype.startsWith('image')) cb(null, true);
-    else cb(new AppError('The uploaded file is not an image', 400), false);
-  },
-});
 
 const uploadTourImages = upload.fields([
   {
@@ -32,7 +28,7 @@ const uploadTourImages = upload.fields([
 
 const resizeTourImages = catchAsync(async (req, res, next) => {
   const { files } = req;
-  if (!files) return next;
+  if (!files) return next();
   req.body.images = [];
   const filesPrefix = `tour-${req.params.id}-${Date.now()}`;
   const imagePromises = [...files.imageCover, ...files.images].map(
@@ -77,7 +73,7 @@ const getToursStats = catchAsync(async (req, res) => {
     {
       $group: {
         _id: '$difficulty',
-        total: { $sum: 1 },
+        results: { $sum: 1 },
         nRatings: { $sum: '$ratingsQuantity' },
         avgRating: { $avg: '$ratingsAverage' },
         avgPrice: { $avg: '$price' },
@@ -86,7 +82,7 @@ const getToursStats = catchAsync(async (req, res) => {
       },
     },
     {
-      $sort: { total: -1 },
+      $sort: { results: -1 },
     },
   ]);
   res.status(200).json({
@@ -149,16 +145,15 @@ const getMonthlyPlan = catchAsync(async (req, res) => {
   });
 });
 
-const EARTH_RADIUS = { mi: 3963.2, km: 6378.1 };
+const REQUEST_ERROR = new AppError(
+  'Provide the coordinates of the current location in the format: lng,lat!',
+  400
+);
 
 const toursWithin = catchAsync(async (req, res) => {
   const { distance, coords, unit } = req.params;
   const [lng, lat] = coords.split(',').map(parseFloat);
-  if (!lat || !lng)
-    throw new AppError(
-      'Provide the coordinates of the current location in the format: lng,lat',
-      400
-    );
+  if (!lat || !lng) throw REQUEST_ERROR;
   const radius = parseFloat(distance) / EARTH_RADIUS[unit] || 'km';
   const tours = await Tour.find({
     startLocation: { $geoWithin: { $centerSphere: [[lng, lat], radius] } },
@@ -172,16 +167,10 @@ const toursWithin = catchAsync(async (req, res) => {
   });
 });
 
-const DISTANCE_TO_METERS = { mi: 1609.344, km: 1000 };
-
 const getDistances = catchAsync(async (req, res) => {
   const { coords, unit } = req.params;
   const [lng, lat] = coords.split(',').map(parseFloat);
-  if (!lat || !lng)
-    throw new AppError(
-      'Provide the coordinates of the current location in the format: lng,lat',
-      400
-    );
+  if (!lat || !lng) throw REQUEST_ERROR;
   const distances = await Tour.aggregate([
     {
       $geoNear: {

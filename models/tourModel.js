@@ -7,33 +7,33 @@ const tourSchema = new Schema(
   {
     name: {
       type: String,
-      required: true,
+      required: [true, 'The body must contain name field!'],
       unique: true,
       trim: true,
-      maxlength: [40, 'The name should not contain more than 40 characters'],
-      minlength: [10, 'The name should not contain less than 10 characters'],
+      maxlength: [40, 'The name should not contain more than 40 characters!'],
+      minlength: [10, 'The name should not contain less than 10 characters!'],
     },
     duration: {
       type: Number,
-      required: true,
+      required: [true, 'The body must contain duration field!'],
     },
     maxGroupSize: {
       type: Number,
-      required: true,
+      required: [true, 'The body must contain maxGroupSize field!'],
     },
     difficulty: {
       type: String,
-      required: true,
+      required: [true, 'The body must contain difficulty field!'],
       enum: {
         values: ['easy', 'medium', 'difficult'],
-        message: 'Invalid difficulty',
+        message: 'Invalid difficulty!',
       },
     },
     ratingsAverage: {
       type: Number,
       default: 0,
-      max: [5, 'The value of ratings should be in range: [0:5]'],
-      min: [0, 'The value of ratings should be in range: [0:5]'],
+      max: [5, 'The value of ratings should be in range: [0:5]!'],
+      min: [0, 'The value of ratings should be in range: [0:5]!'],
       set: (val) => Math.round(val * 10) / 10,
     },
     ratingsQuantity: {
@@ -42,20 +42,20 @@ const tourSchema = new Schema(
     },
     price: {
       type: Number,
-      required: true,
+      required: [true, 'The body must contain price field!'],
     },
     priceDiscount: {
       type: Number,
       validate: {
-        validator: function (newPrice) {
-          return newPrice < this.price && newPrice > 0;
+        validator: function (nextPrice) {
+          return nextPrice < this.get('price') && nextPrice > 0;
         },
-        message: 'Invalid discount: {VALUE} should be less than price',
+        message: 'Invalid discount: {VALUE} should be less than price!',
       },
     },
     summary: {
       type: String,
-      required: true,
+      required: [true, 'The body must contain summary field!'],
       trim: true,
     },
     description: {
@@ -64,7 +64,7 @@ const tourSchema = new Schema(
     },
     imageCover: {
       type: String,
-      required: true,
+      required: [true, 'The body must contain imageCover field!'],
     },
     images: [String],
     startLocation: {

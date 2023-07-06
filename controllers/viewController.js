@@ -2,11 +2,21 @@
 
 const Tour = require('../models/tourModel');
 const catchAsync = require('../utils/catchAsync');
-const AppError = require('../utils/AppError');
+const AppError = require('../utils/appError');
+const PAGE_ALERTS = require('../constants/appConstants');
+
+const getAlert = (req, res, next) => {
+  const { alert } = req.query;
+  if (alert) res.locals.alert = PAGE_ALERTS[alert];
+  next();
+};
 
 const getOverview = catchAsync(async (req, res) => {
   const tours = await Tour.find();
-  res.status(200).render('overview', { title: 'All Tours', tours });
+  res.status(200).render('overview', { 
+    title: 'All Tours', 
+    tours 
+  });
 });
 
 const getTour = catchAsync(async (req, res) => {
@@ -15,12 +25,17 @@ const getTour = catchAsync(async (req, res) => {
     path: 'reviews',
     select: 'content rating user',
   });
-  if (!tour) throw new AppError('Tour not found', 404);
-  res.status(200).render('tour', { title: `${tour.name} Tour`, tour });
+  if (!tour) throw new AppError('Tour not found!', 404);
+  res.status(200).render('tour', { 
+    title: `${tour.name} Tour`, 
+    tour 
+  });
 });
 
 const getLoginForm = (req, res) => {
-  res.status(200).render('login', { title: 'Log into account' });
+  res.status(200).render('login', { 
+    title: 'Log into account' 
+  });
 };
 
 const getAccount = (req, res) => {
@@ -31,20 +46,10 @@ const getAccount = (req, res) => {
   });
 };
 
-const PAGE_ALERTS = {
-  booking: 'Your booking was successful!',
-};
-
-const getAlert = (req, res, next) => {
-  const { alert } = req.query;
-  if (alert) res.locals.alert = PAGE_ALERTS[alert];
-  next();
-};
-
 module.exports = {
+  getAlert,
   getOverview,
   getTour,
   getLoginForm,
   getAccount,
-  getAlert,
 };

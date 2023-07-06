@@ -2,15 +2,15 @@
 
 const prepareQuery = require('../utils/prepareQuery');
 const catchAsync = require('../utils/catchAsync');
-const AppError = require('../utils/AppError');
-const QUERY_EXCLUDED_FIELDS = require('../constants/queryExcludedFields');
+const AppError = require('../utils/appError');
+const { QUERY_EXCLUDED_FIELDS } = require('../constants/appConstants');
 
 class ControllerFactory {
   constructor(Model) {
     const modelName = Model.modelName.toLowerCase();
     this.Model = Model;
     this.modelName = modelName;
-    this.idError = new AppError(`Invalid ${modelName} ID`, 404);
+    this.idError = new AppError(`Invalid ${modelName} ID!`, 404);
   }
 
   getAll(options) {

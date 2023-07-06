@@ -7,16 +7,16 @@ const reviewSchema = new Schema(
   {
     content: {
       type: String,
-      required: true,
+      required: [true, 'The body must contain content field!'],
       maxlength: [
         300,
-        'The maximum allowed number of characters has been exceeded',
+        'The maximum allowed number of characters has been exceeded!',
       ],
-      minlength: [1, 'Review content can not be empty'],
+      minlength: [1, 'The content can not be empty!'],
     },
     rating: {
       type: Number,
-      required: true,
+      required: [true, 'The body must contain rating field!'],
       max: 5,
       min: 1,
     },
@@ -27,12 +27,12 @@ const reviewSchema = new Schema(
     tour: {
       type: Schema.ObjectId,
       ref: 'Tour',
-      required: true,
+      required: [true, 'The body must contain tour field!'],
     },
     user: {
       type: Schema.ObjectId,
       ref: 'User',
-      required: true,
+      required: [true, 'The body must contain user field!'],
     },
   },
   {
@@ -41,13 +41,7 @@ const reviewSchema = new Schema(
   }
 );
 
-reviewSchema.pre(/^find/, function (next) {
-  this.populate({
-    path: 'user',
-    select: 'name photo',
-  });
-  next();
-});
+reviewSchema.index({ tour: 1, user: 1 }, { unique: true });
 
 reviewSchema.statics.calcAverageRatings = async function (tour) {
   const stats = await this.aggregate([
@@ -66,16 +60,22 @@ reviewSchema.statics.calcAverageRatings = async function (tour) {
   await Tour.findByIdAndUpdate(tour, { ratingsAverage, ratingsQuantity });
 };
 
-reviewSchema.index({ tour: 1, user: 1 }, { unique: true });
-
-reviewSchema.post('save', async function (doc, next) {
-  await this.constructor.calcAverageRatings(doc.tour);
+reviewSchema.pre(/^find/, function (next) {
+  this.populate({
+    path: 'user',
+    select: 'name photo',
+  });
   next();
 });
 
 reviewSchema.pre(/^findOneAnd(?:Delete|Update)$/, async function (next) {
   const { tour } = await this.model.findOne(this.getQuery());
   this.tour = tour;
+  next();
+});
+
+reviewSchema.post('save', async function (doc, next) {
+  await this.constructor.calcAverageRatings(doc.tour);
   next();
 });
 

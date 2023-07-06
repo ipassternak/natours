@@ -1,14 +1,8 @@
 'use strict';
 
-const AppError = require('../utils/AppError');
+const AppError = require('../utils/appError');
 
-const DEV_MODE = process.env.NODE_ENV === 'dev';
-
-const pageErrorMessages = {
-  401: 'You are not logged in!',
-  403: 'You do not have access to this page!',
-  404: 'Page not found!',
-};
+const DEV_MODE = process.env.NODE_ENV === 'development';
 
 const sendGenericError = (err, req, res) => {
   const { statusCode, status, message } = err;
@@ -20,7 +14,7 @@ const sendGenericError = (err, req, res) => {
   } else {
     res.status(statusCode).render('error', {
       title: `${statusCode}`,
-      message: pageErrorMessages[statusCode],
+      message,
     });
   }
 };
@@ -28,21 +22,18 @@ const sendGenericError = (err, req, res) => {
 const mongoErrorCodeHandlers = {
   11000: (err) => {
     const duplicates = err.keyValue;
-    const fields = Object.keys(duplicates);
-    const { length } = fields;
-    const noun = length === 1 ? 'value' : 'values';
-    const adj = length === 1 ? 'another' : 'others';
-    return `Duplicated field ${noun}: ${fields.join(', ')}. Use ${adj} ${noun}`;
+    const fields = Object.keys(duplicates).join(', ');
+    return `The field value is already taken. Use unique value for field: ${fields}!`;
   },
 };
 
-const handleAppError = (err) => err;
-
 const handleMongoErrors = (err) => {
   const handler = mongoErrorCodeHandlers[err.code];
-  const message = handler ? handler(err) : 'Bad request';
+  const message = handler ? handler(err) : 'Bad request!';
   return new AppError(message, 400);
 };
+
+const handleAppError = (err) => err;
 
 const hanldeCastError = (err) => {
   const message = `Invalid ${err.path}: ${err.value}`;
@@ -55,9 +46,10 @@ const handleValidationError = (err) => {
   return new AppError(message, 400);
 };
 
-const handleJWTError = () => new AppError('Invalid token', 401);
+const handleJWTError = () => new AppError('You are not logged in!', 401);
 
-const handleJWTExpired = () => new AppError('Token has expired', 401);
+const handleJWTExpired = () => 
+  new AppError('Token has expired. Log in again!', 401);
 
 const handleUnexpectedError = (err) => {
   if (!DEV_MODE) console.error(err);

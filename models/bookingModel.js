@@ -6,16 +6,16 @@ const bookingSchema = new Schema({
   tour: {
     type: Schema.ObjectId,
     ref: 'Tour',
-    required: true,
+    required: [true, 'The body must contain tour field!'],
   },
   user: {
     type: Schema.ObjectId,
     ref: 'User',
-    required: true,
+    required: [true, 'The body must contain user field!'],
   },
   price: {
     type: Number,
-    required: true,
+    required: [true, 'The body must contain price field!'],
   },
   createdAt: {
     type: Date,

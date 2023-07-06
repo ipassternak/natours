@@ -18,8 +18,8 @@ const getCheckoutSession = catchAsync(async (req, res) => {
   const tour = await Tour.findById(req.params.tourId);
   const session = await stripe.checkout.sessions.create({
     payment_method_types: ['card'],
-    success_url: `http://127.0.0.1:8000/?tour=${req.params.tourId}&user=${req.user._id}&price=${tour.price}`,
-    cancel_url: `http://127.0.0.1:8000/tour/${tour.slug}`,
+    success_url: `${req.protocol}://${req.get('host')}/?tour=${req.params.tourId}&user=${req.user._id}&price=${tour.price}`,
+    cancel_url: `${req.protocol}://${req.get('host')}/tour/${tour.slug}`,
     customer_email: req.user.email,
     client_reference_id: req.params.tourId,
     mode: 'payment',
@@ -48,7 +48,7 @@ const createBookingCheckout = catchAsync(async (req, res, next) => {
   const { tour, user, price } = req.query;
   if (!tour || !user || !price) return next();
   await Booking.create({ tour, user, price });
-  res.redirect('http://127.0.0.1:8000/bookings?alert=booking');
+  res.redirect(`${req.protocol}://${req.get('host')}/bookings?alert=booking`);
 });
 
 const getBookedTours = catchAsync(async (req, res) => {
@@ -59,7 +59,7 @@ const getBookedTours = catchAsync(async (req, res) => {
     _id: { $in: tourIDs },
   });
   res.status(200).render('overview', {
-    title: 'Booked tours',
+    title: 'Bookings',
     user,
     tours,
   });

@@ -8,14 +8,14 @@ const { isEmail } = require('validator');
 const userSchema = new Schema({
   name: {
     type: String,
-    required: true,
+    required: [true, 'The body must contain name field!'],
     trim: true,
-    maxlength: [20, 'The name should not contain more than 20 characters'],
-    minlength: [1, 'The name should not contain less than 1 characters'],
+    maxlength: [20, 'The name should not contain more than 20 characters1'],
+    minlength: [1, 'The name should not contain less than 1 characters!'],
   },
   email: {
     type: String,
-    required: true,
+    required: [true, 'The body must contain email field!'],
     unique: true,
     lowercase: true,
     validate: [isEmail, 'Invalid email'],
@@ -30,19 +30,19 @@ const userSchema = new Schema({
   },
   password: {
     type: String,
-    required: true,
+    required: [true, 'The body must contain password field!'],
     select: false,
-    maxlength: [20, 'The password should not contain more than 20 characters'],
-    minlength: [8, 'The password should not contain less than 10 characters'],
+    maxlength: [20, 'The password should not contain more than 20 characters!'],
+    minlength: [8, 'The password should not contain less than 10 characters!'],
   },
   passwordConfirm: {
     type: String,
-    required: true,
+    required: [true, 'The body must contain passwordConfirm field!'],
     validate: {
       validator: function (confirmation) {
         return confirmation === this.password;
       },
-      message: 'Invalid password confirmation',
+      message: 'Invalid password confirmation!',
     },
   },
   passwordChangedAt: Date,
@@ -98,13 +98,16 @@ userSchema.methods.verifyJWTTimestamp = function (timestamp) {
   return changedTimestamp < timestamp;
 };
 
+const PASSWORD_EXPIRES_IN = 
+  parseInt(process.env.PASSWORD_EXPIRES_IN) * 60 * 1000;
+
 userSchema.methods.createPasswordResetToken = function () {
   const token = crypto.randomBytes(32).toString('hex');
   this.passwordResetToken = crypto
     .createHash('sha256')
     .update(token)
     .digest('hex');
-  this.passwordResetExpires = Date.now() + 10 * 60 * 1000;
+  this.passwordResetExpires = Date.now() + PASSWORD_EXPIRES_IN ;
   return token;
 };
 

@@ -6,6 +6,7 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "nodemon server.js",
+    "reload:dev": "node ./dev-data/reloadDevData.js --delete --import",
     "start": "node server.js",
     "debug": "ndb server.js",
     "build": "npx webpack --mode production"

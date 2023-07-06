@@ -1,6 +1,6 @@
 'use strict';
 
-const ALLOWED_QUERY_OPERATORS = require('../constants/allowedQueryOperators');
+const { ALLOWED_QUERY_OPERATORS } = require('../constants/appConstants');
 
 const excludeFields = (obj, ...excluded) => {
   const res = {};
