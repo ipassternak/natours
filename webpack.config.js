@@ -1,7 +1,9 @@
+const CWD = process.cwd();
+
 module.exports = {
-  entry: `${process.cwd()}/public/js/index.js`,
+  entry: `${CWD}/public/js/index.js`,
   output: {
-    path: `${process.cwd()}/public/dist`,
+    path: `${CWD}/public/dist`,
     filename: 'bundle.js',
   },
   module: {
