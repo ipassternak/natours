@@ -3,6 +3,7 @@ const express = require('express');
 const {
   getOverview,
   getTour,
+  getSignupForm,
   getLoginForm,
   getAccount,
   getAlert,
@@ -24,6 +25,7 @@ router.use(isLoggedIn);
 
 router.get('/', createBookingCheckout, getOverview);
 router.get('/tour/:slug', getTour);
+router.get('/signup', getSignupForm);
 router.get('/login', confirmRegistation, getLoginForm);
 
 module.exports = router;

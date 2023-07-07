@@ -32,6 +32,12 @@ const getTour = catchAsync(async (req, res) => {
   });
 });
 
+const getSignupForm = (req, res) => {
+  res.status(200).render('signup', { 
+    title: 'Sign up new account' 
+  });
+};
+
 const getLoginForm = (req, res) => {
   res.status(200).render('login', { 
     title: 'Log into account' 
@@ -50,6 +56,7 @@ module.exports = {
   getAlert,
   getOverview,
   getTour,
+  getSignupForm,
   getLoginForm,
   getAccount,
 };

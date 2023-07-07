@@ -1,9 +1,10 @@
-import { login, logout } from './login.js';
+import { signup, login, logout } from './auth.js';
 import { updateProfile, changePassword } from './updateSettings.js';
 import { bookTour } from './stripe.js';
 import { displayAlert } from './alerts.js';
 import { displayMap } from './map.js';
 
+const signupForm = document.querySelector('.form--signup');
 const loginForm = document.querySelector('.form--login');
 const updateProfileForm = document.querySelector('.form-user-data');
 const changePasswordForm = document.querySelector('.form-user-password');
@@ -15,17 +16,34 @@ const passwordField = document.getElementById('password');
 const passwordConfirmField = document.getElementById('password-confirm');
 const bookBtn = document.getElementById('book-tour');
 
+const sumbitBtn = document.querySelector('.btn.btn--green');
 const logoutBtn = document.querySelector('.nav__el.nav__el--logout');
 const changePasswordBtn = document.querySelector('.btn-change-password');
 const alertMessage = document.querySelector('body').dataset.alert;
 const map = document.getElementById('map');
 
-if (loginForm) {
-  loginForm.addEventListener('submit', (ev) => {
+const getValues = (fields) => fields.map((field) => field.value);
+const removeValues = (fields) => fields.forEach((field) => field.value = '');
+
+if (signupForm) {
+  const fields = [nameField, emailField, passwordField, passwordConfirmField];
+  signupForm.addEventListener('submit', async (ev) => {
     ev.preventDefault();
-    const email = emailField.value;
-    const password = passwordField.value;
-    login(email, password);
+    sumbitBtn.textContent = 'Submitting...';
+    await signup(...getValues(fields));
+    fields.forEach((field) => field.value = '');
+    sumbitBtn.textContent = 'Sign up';
+  });
+}
+
+if (loginForm) {
+  const fields = [emailField, passwordField];
+  loginForm.addEventListener('submit', async (ev) => {
+    ev.preventDefault();
+    sumbitBtn.textContent = 'Submitting...';
+    await login(...getValues(fields));
+    removeValues(fields);
+    sumbitBtn.textContent = 'Log in';
   });
 }
 
@@ -45,7 +63,7 @@ if (updateProfileForm) {
 }
 
 if (changePasswordForm) {
-  const passwordFields = [
+  const fields = [
     currenPasswordField,
     passwordField,
     passwordConfirmField,
@@ -58,7 +76,7 @@ if (changePasswordForm) {
     const passwordConfirm = passwordConfirmField.value;
     await changePassword({ currentPassword, password, passwordConfirm });
     changePasswordBtn.textContent = 'Change password';
-    passwordFields.forEach((field) => (field.value = ''));
+    removeValues(fields);
   });
 }
 
