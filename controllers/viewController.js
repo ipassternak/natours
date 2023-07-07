@@ -28,7 +28,7 @@ const getTour = catchAsync(async (req, res) => {
   });
   const booking = await Booking.exists({ 
     tour: tour._id, 
-    user: res.locals.user._id 
+    user: res.locals.user?._id 
   });
   if (!tour) throw new AppError('Tour not found!', 404);
   res.status(200).render('tour', { 
@@ -50,6 +50,21 @@ const getLoginForm = (req, res) => {
   });
 };
 
+const getForgotPassordForm = (req, res) => {
+  res.status(200).render('forgotPassword', { 
+    title: 'Forgot password' 
+  });
+};
+
+
+const getResetPassordForm = (req, res) => {
+  const { resetToken } = req.params;
+  res.status(200).render('resetPassword', { 
+    title: 'Reset password',
+    resetToken,
+  });
+};
+
 const getAccount = (req, res) => {
   const { user } = req;
   res.status(200).render('account', {
@@ -64,5 +79,7 @@ module.exports = {
   getTour,
   getSignupForm,
   getLoginForm,
+  getForgotPassordForm,
+  getResetPassordForm,
   getAccount,
 };

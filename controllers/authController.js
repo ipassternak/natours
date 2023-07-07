@@ -167,12 +167,12 @@ const forgotPassword = catchAsync(async (req, res) => {
   await user.save({ validateBeforeSave: false });
   const resetURL = `${req.protocol}://${req.get(
     'host'
-  )}/api/v1/users/reset-password/${resetToken}`;
+  )}/reset-password/${resetToken}`;
   try {
     await emailTemplates.sendResetPassword(user, resetURL);
     res.status(200).json({
       status: 'success',
-      message: 'The token has been sent to your email address!',
+      message: 'To reset your password check your email!',
     });
   } catch (err) {
     user.passwordResetToken = undefined;

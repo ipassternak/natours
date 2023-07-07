@@ -54,3 +54,42 @@ export const logout = async () => {
     displayAlert('error', 'Failed logging out. Try again!');
   }
 };
+
+export const forgotPassword = async (email) => {
+  try {
+    const res = await fetch('/api/v1/users/forgot-password', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ email }),
+    });
+    const body = await res.json();
+    if (!res.ok) throw new Error(body.message);
+    displayAlert('success', body.message);
+  } catch (err) {
+    displayAlert('error', `${err.message}`);
+  }
+};
+
+export const resetPassword = async (resetToken, password, passwordConfirm) => {
+  try {
+    const res = await fetch(`/api/v1/users/reset-password/${resetToken}`, {
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ password, passwordConfirm }),
+    });
+    if (!res.ok) {
+      const body = await res.json();
+      throw new Error(body.message);
+    }
+    displayAlert('success', 'You restored your password successfully!');
+    window.setTimeout(() => {
+      location.assign('/');
+    }, 1000);
+  } catch (err) {
+    displayAlert('error', `${err.message}`);
+  }
+};

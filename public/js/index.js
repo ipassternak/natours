@@ -1,4 +1,10 @@
-import { signup, login, logout } from './auth.js';
+import { 
+  signup, 
+  login, 
+  logout, 
+  forgotPassword, 
+  resetPassword 
+} from './auth.js';
 import { updateProfile, changePassword } from './updateSettings.js';
 import { bookTour } from './stripe.js';
 import { displayAlert } from './alerts.js';
@@ -6,6 +12,8 @@ import { displayMap } from './map.js';
 
 const signupForm = document.querySelector('.form--signup');
 const loginForm = document.querySelector('.form--login');
+const forgotPasswordForm = document.querySelector('.forgot-password--form');
+const resetPasswordForm = document.querySelector('.reset-password--form');
 const updateProfileForm = document.querySelector('.form-user-data');
 const changePasswordForm = document.querySelector('.form-user-password');
 const nameField = document.getElementById('name');
@@ -44,6 +52,31 @@ if (loginForm) {
     const { textContent } = sumbitBtn;
     sumbitBtn.textContent = 'Submitting...';
     await login(...getValues(fields));
+    removeValues(fields);
+    sumbitBtn.textContent = textContent;
+  });
+}
+
+if (forgotPasswordForm) {
+  forgotPasswordForm.addEventListener('submit', async (ev) => {
+    ev.preventDefault();
+    const { textContent } = sumbitBtn;
+    sumbitBtn.textContent = 'Submitting...';
+    const email = emailField.value;
+    await forgotPassword(email);
+    emailField.value = '';
+    sumbitBtn.textContent = textContent;
+  });
+}
+
+if (resetPasswordForm) {
+  const fields = [passwordField, passwordConfirmField];
+  resetPasswordForm.addEventListener('submit', async (ev) => {
+    ev.preventDefault();
+    const { textContent } = sumbitBtn;
+    sumbitBtn.textContent = 'Submitting...';
+    const { resetToken } = resetPasswordForm.dataset;
+    await resetPassword(resetToken, ...getValues(fields));
     removeValues(fields);
     sumbitBtn.textContent = textContent;
   });

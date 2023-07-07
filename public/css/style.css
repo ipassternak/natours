@@ -693,7 +693,7 @@ body {
 
 .cta {
   position: relative;
-  max-width: 110rem;
+  max-width: 115rem;
   margin: 0 auto;
   overflow: hidden;
   background-color: #fff;
@@ -1392,4 +1392,11 @@ body {
   box-shadow: 0 1rem 2rem rgba(0, 0, 0, 0.15);
   -webkit-transform: translateY(-2px);
   transform: translateY(-2px);
+}
+
+.forgot__password {
+  position: relative;
+  margin-left: 200px;
+  font-size: 12px;
+  bottom: 70px;
 }

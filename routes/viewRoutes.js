@@ -5,6 +5,8 @@ const {
   getTour,
   getSignupForm,
   getLoginForm,
+  getForgotPassordForm,
+  getResetPassordForm,
   getAccount,
   getAlert,
 } = require('../controllers/viewController');
@@ -27,5 +29,7 @@ router.get('/', createBookingCheckout, getOverview);
 router.get('/tour/:slug', getTour);
 router.get('/signup', getSignupForm);
 router.get('/login', confirmRegistation, getLoginForm);
+router.get('/forgot-password', getForgotPassordForm);
+router.get('/reset-password/:resetToken', getResetPassordForm);
 
 module.exports = router;
