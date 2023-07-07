@@ -15,6 +15,7 @@ const ALLOWED_QUERY_OPERATORS = ['gte', 'gt', 'lte', 'lt', 'eq', 'ne'];
 
 const PAGE_ALERTS = {
   booking: 'Your booking was successful!',
+  completeRegistation: 'Your account confirmed. Log in to start your new journey!',
 };
 
 module.exports = { 

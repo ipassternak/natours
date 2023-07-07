@@ -46,9 +46,30 @@ const signup = catchAsync(async (req, res) => {
     password,
     passwordConfirm,
   });
+  const accountConfirmToken = await user.createConfirmToken();
+  const url = `${req.protocol}://${req.get('host')}/login?token=${accountConfirmToken}`;
+  await emailTemplates.sendAccountConfirmToken(user, url);
+  await res.status(200).json({
+    status: 'success',
+    message: 'To complete the registration check your email!',
+  })
+});
+
+const confirmRegistation = catchAsync(async (req, res, next) => {
+  const { token } = req.query;
+  if (!token) return next();
+  const accountConfirmToken = crypto
+    .createHash('sha256')
+    .update(token)
+    .digest('hex');
+  const user = await User.findOne({ accountConfirmToken }).select('+disabledAt');
+  if (!user) throw new AppError('This account no longer exists!', 404);
+  user.disabledAt = null;
+  user.accountConfirmToken = undefined;
+  await user.save({ validateBeforeSave: false });
   const url = `${req.protocol}://${req.get('host')}/account`;
   await emailTemplates.sendWelcome(user, url);
-  await sendToken(req, res, user, 201);
+  await res.redirect('/login?alert=completeRegistation');
 });
 
 const login = catchAsync(async (req, res) => {
@@ -59,7 +80,11 @@ const login = catchAsync(async (req, res) => {
       400
     );
   const user = await User.findOne({ email }).select('+password');
-  if (!user || !(await user.verifyPassword(password, user.password)))
+  const isInvalid = 
+    !user || 
+    user.accountConfirmToken || 
+    !(await user.verifyPassword(password, user.password));
+  if (isInvalid)
     throw new AppError(
       'Invalid email or password. Check them out and try again!', 
       401
@@ -206,6 +231,7 @@ const isLoggedIn = async (req, res, next) => {
 
 module.exports = {
   signup,
+  confirmRegistation,
   login,
   logout,
   protect,

@@ -1,0 +1,15 @@
+extends index
+
+block content
+  p Hi #{firstName},
+    p To complete the registration of your account, click 'Confirm account registration' button
+    table.btn.btn-primary(role='presentation', border='0', cellpadding='0', cellspacing='0')
+      tbody
+        tr
+          td(align='left')
+            table(role='presentation', border='0', cellpadding='0', cellspacing='0')
+              tbody
+                tr
+                  td
+                    a(href=`${url}`, target='_blank') Confirm account registration
+    p If you have not registrated an account on Natours, ignore this email

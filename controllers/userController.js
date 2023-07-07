@@ -54,7 +54,7 @@ const updateAccount = catchAsync(async (req, res) => {
 });
 
 const deleteAccount = catchAsync(async (req, res) => {
-  await User.findByIdAndUpdate(req.user._id, { active: false });
+  await User.findByIdAndUpdate(req.user._id, { disabledAt: Date.now() });
   res.status(204).json({
     status: 'success',
     data: null,

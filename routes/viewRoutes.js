@@ -7,7 +7,7 @@ const {
   getAccount,
   getAlert,
 } = require('../controllers/viewController');
-const { protect, isLoggedIn } = require('../controllers/authController');
+const { confirmRegistation, protect, isLoggedIn } = require('../controllers/authController');
 const {
   createBookingCheckout,
   getAccountBookings,
@@ -24,6 +24,6 @@ router.use(isLoggedIn);
 
 router.get('/', createBookingCheckout, getOverview);
 router.get('/tour/:slug', getTour);
-router.get('/login', getLoginForm);
+router.get('/login', confirmRegistation, getLoginForm);
 
 module.exports = router;

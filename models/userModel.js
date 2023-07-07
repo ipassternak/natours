@@ -20,6 +20,10 @@ const userSchema = new Schema({
     lowercase: true,
     validate: [isEmail, 'Invalid email'],
   },
+  photo: {
+    type: String,
+    default: 'default.jpg',
+  },
   role: {
     type: String,
     enum: {
@@ -48,15 +52,13 @@ const userSchema = new Schema({
   passwordChangedAt: Date,
   passwordResetToken: String,
   passwordResetExpires: Date,
-  active: {
-    type: Boolean,
-    default: true,
+  disabledAt: {
+    type: Date,
+    default: null,
+    expires: '1d',
     select: false,
   },
-  photo: {
-    type: String,
-    default: 'default.jpg',
-  },
+  accountConfirmToken: String,
 });
 
 const PASSWORD_SALT_ROUNDS = parseInt(process.env.PASSWORD_SALT_ROUNDS);
@@ -82,8 +84,24 @@ userSchema.pre('save', function (next) {
   next();
 });
 
+userSchema.methods.createConfirmToken = async function () {
+  const token = crypto.randomBytes(32).toString('hex');
+  this.accountConfirmToken = crypto
+    .createHash('sha256')
+    .update(token)
+    .digest('hex');
+  this.disabledAt = Date.now();  
+  await this.save({ validateBeforeSave: false });
+  return token;
+};
+
 userSchema.pre(/^find/, function (next) {
-  this.find({ active: true });
+  this.find({
+    $or: [
+      { disabledAt: null },
+      { accountConfirmToken: { $exists: true } }
+    ]
+  });
   next();
 });
 

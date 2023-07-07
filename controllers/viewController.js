@@ -3,7 +3,7 @@
 const Tour = require('../models/tourModel');
 const catchAsync = require('../utils/catchAsync');
 const AppError = require('../utils/appError');
-const PAGE_ALERTS = require('../constants/appConstants');
+const { PAGE_ALERTS } = require('../constants/appConstants');
 
 const getAlert = (req, res, next) => {
   const { alert } = req.query;

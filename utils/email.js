@@ -55,6 +55,10 @@ const createTemp = (template, subject) => {
 
 const emailTemplates = {
   sendWelcome: createTemp('welcome', 'Welcome to the Natours!'),
+  sendAccountConfirmToken: createTemp(
+    'accountConfirm',
+    'Your account confirmation token (valid for only 1 day after registration)',
+  ),
   sendResetPassword: createTemp(
     'passwordReset',
     `Your password reset token (valid for only ${PASSWORD_EXPIRES_IN} minutes)`
