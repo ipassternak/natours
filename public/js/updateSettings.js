@@ -23,6 +23,6 @@ export const updateProfile = updateSettings.bind(
 );
 export const changePassword = updateSettings.bind(
   null,
-  '/api/v1/users/account/changePassword',
+  '/api/v1/users/account/change-password',
   'Password was changed successfully!'
 );

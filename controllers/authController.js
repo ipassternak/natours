@@ -167,7 +167,7 @@ const forgotPassword = catchAsync(async (req, res) => {
   await user.save({ validateBeforeSave: false });
   const resetURL = `${req.protocol}://${req.get(
     'host'
-  )}/api/v1/users/resetPassword/${resetToken}`;
+  )}/api/v1/users/reset-password/${resetToken}`;
   try {
     await emailTemplates.sendResetPassword(user, resetURL);
     res.status(200).json({

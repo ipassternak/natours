@@ -16,7 +16,7 @@ const router = express.Router({ mergeParams: true });
 
 router.use(protect);
 
-router.get('/checkoutSession/:tourId/:startDate', getCheckoutSession);
+router.get('/checkout-session/:tourId/:startDate', getCheckoutSession);
 
 router.use(restrictToRoles('admin'));
 

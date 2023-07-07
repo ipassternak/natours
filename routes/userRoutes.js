@@ -28,8 +28,8 @@ const router = express.Router();
 router.post('/signup', signup);
 router.post('/login', login);
 router.get('/logout', logout);
-router.post('/forgotPassword', forgotPassword);
-router.patch('/resetPassword/:token', resetPassword);
+router.post('/forgot-password', forgotPassword);
+router.patch('/reset-password/:token', resetPassword);
 
 router.use(protect);
 
@@ -39,7 +39,7 @@ router
   .patch(uploadUserPhoto, resizeUserPhoto, updateAccount)
   .delete(deleteAccount);
 
-router.patch('/account/changePassword', changePassword);
+router.patch('/account/change-password', changePassword);
 
 router.use(restrictToRoles('admin'));
 

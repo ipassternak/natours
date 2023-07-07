@@ -6,7 +6,7 @@ const stripe = Stripe(
 
 export const bookTour = async (bookedTour) => {
   try {
-    const res = await fetch(`/api/v1/bookings/checkoutSession/${bookedTour}`, {
+    const res = await fetch(`/api/v1/bookings/checkout-session/${bookedTour}`, {
       method: 'GET',
     });
     if (!res.ok) {
