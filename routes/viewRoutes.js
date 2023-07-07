@@ -12,7 +12,6 @@ const {
 } = require('../controllers/viewController');
 const { confirmRegistation, protect, isLoggedIn } = require('../controllers/authController');
 const {
-  createBookingCheckout,
   getAccountBookings,
 } = require('../controllers/bookingController');
 
@@ -25,7 +24,7 @@ router.get('/bookings', protect, getAccountBookings);
 
 router.use(isLoggedIn);
 
-router.get('/', createBookingCheckout, getOverview);
+router.get('/', getOverview);
 router.get('/tour/:slug', getTour);
 router.get('/signup', getSignupForm);
 router.get('/login', confirmRegistation, getLoginForm);

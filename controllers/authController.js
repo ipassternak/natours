@@ -163,7 +163,7 @@ const forgotPassword = catchAsync(async (req, res) => {
   const user = await User.findOne({ email });
   if (!user) 
     throw new AppError('Invalid email. Check it out and try again!', 404);
-  const resetToken = user.createPasswordResetToken();
+  const resetToken = await user.createPasswordResetToken();
   await user.save({ validateBeforeSave: false });
   const resetURL = `${req.protocol}://${req.get(
     'host'

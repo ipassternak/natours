@@ -8,6 +8,7 @@ const {
   updateBooking,
   deleteBooking,
   getCheckoutSession,
+  createBookingCheckout,
 } = require('../controllers/bookingController');
 const { protect, restrictToRoles } = require('../controllers/authController');
 const queryNestedId = require('../utils/queryNestedId');
@@ -17,6 +18,8 @@ const router = express.Router({ mergeParams: true });
 router.use(protect);
 
 router.get('/checkout-session/:tourId/:startDate', getCheckoutSession);
+
+router.get('/webhook-checkout/:id/:paidToken', createBookingCheckout);
 
 router.use(restrictToRoles('admin'));
 

@@ -1,5 +1,6 @@
 'use strict';
 
+const crypto = require('node:crypto');
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 const Booking = require('../models/bookingModel');
 const Tour = require('../models/tourModel');
@@ -29,15 +30,29 @@ const checkDisiredDate = async (tour, disiredDate) => {
 
 const getCheckoutSession = catchAsync(async (req, res) => {
   const { tourId, startDate } = req.params;
+  const userId = req.user._id;
   const disiredDate = parseInt(startDate);
   const tour = await Tour.findById(tourId);
   await checkDisiredDate(tour, disiredDate);
-  const alreadyBooked = await Booking.findOne({ tour: tourId, user: req.user._id });
-  if (alreadyBooked) throw new AppError('You have already booked this tour!', 400);
+  const alreadyBooked = await Booking.findOne({ 
+    tour: tourId, 
+    user: userId  
+  });
+  if (alreadyBooked) 
+    throw new AppError('You have already booked this tour!', 400);
+  const booking = await Booking.create({ 
+    tour: tourId, 
+    user: userId, 
+    price: tour.price,
+    date: new Date(disiredDate).toISOString(),
+  });
+  const domain = `${req.protocol}://${req.get('host')}/api/v1/bookings`;
+  const [success, cancel] = await booking.generatePaidTokens();
+  const { _id: id } = booking;
   const session = await stripe.checkout.sessions.create({
     payment_method_types: ['card'],
-    success_url: `${req.protocol}://${req.get('host')}/?tour=${req.params.tourId}&user=${req.user._id}&price=${tour.price}`,
-    cancel_url: `${req.protocol}://${req.get('host')}/tour/${tour.slug}`,
+    success_url: `${domain}/webhook-checkout/${id}/${success}`,
+    cancel_url: `${domain}/webhook-checkout/${id}/${cancel}`,
     customer_email: req.user.email,
     client_reference_id: req.params.tourId,
     mode: 'payment',
@@ -58,20 +73,42 @@ const getCheckoutSession = catchAsync(async (req, res) => {
   });
   res.status(200).json({
     status: 'success',
-    session,
+    sessionId: session.id,
   });
 });
 
-const createBookingCheckout = catchAsync(async (req, res, next) => {
-  const { tour, user, price } = req.query;
-  if (!tour || !user || !price) return next();
-  await Booking.create({ tour, user, price });
-  res.redirect(`${req.protocol}://${req.get('host')}/bookings?alert=booking`);
+const BOOKING_ERROR = new AppError('Invalid booking!', 400);
+
+const freeTourSpot = async (booking) => {
+  const tour = await Tour.findById(booking.tour);
+  tour.startDates[booking.date]--;
+  await tour.save();
+};
+
+const createBookingCheckout = catchAsync(async (req, res) => {
+  const { id, paidToken } = req.params;
+  const booking = await Booking
+    .findById(id)
+    .select('+successPaidToken +cancelPaidToken');
+  if (!booking) throw BOOKING_ERROR
+  const encrypted = crypto
+    .createHash('sha256')
+    .update(paidToken)
+    .digest('hex');
+  const success = booking.successPaidToken === encrypted;
+  const cancel = booking.cancelPaidToken === encrypted;
+  if (!success && !cancel) throw BOOKING_ERROR;
+  if (success) booking.paid = true;
+  else freeTourSpot(booking);
+  booking.successPaidToken = undefined;
+  booking.cancelPaidToken = undefined;
+  await booking.save({ validateBeforeSave: false });
+  res.redirect(`/bookings?alert=${success ? 'success' : 'cancel'}-booking`);
 });
 
 const getAccountBookings = catchAsync(async (req, res) => {
   const { user } = req;
-  const bookings = await Booking.find({ user: user._id });
+  const bookings = await Booking.find({ user: user._id, paid: true });
   const tourIDs = bookings.map((booking) => booking.tour._id);
   const tours = await Tour.find({
     _id: { $in: tourIDs },

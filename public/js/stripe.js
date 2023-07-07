@@ -9,13 +9,10 @@ export const bookTour = async (bookedTour) => {
     const res = await fetch(`/api/v1/bookings/checkout-session/${bookedTour}`, {
       method: 'GET',
     });
-    if (!res.ok) {
-      const body = await res.json();
-      throw new Error(body.message);
-    }
-    const { session } = await res.json();
+    const body = await res.json();
+    if (!res.ok) throw new Error(body.message);
     await stripe.redirectToCheckout({
-      sessionId: session.id,
+      sessionId: body.sessionId,
     });
   } catch (err) {
     displayAlert('error', err.message);

@@ -119,13 +119,14 @@ userSchema.methods.verifyJWTTimestamp = function (timestamp) {
 const PASSWORD_EXPIRES_IN = 
   parseInt(process.env.PASSWORD_EXPIRES_IN) * 60 * 1000;
 
-userSchema.methods.createPasswordResetToken = function () {
+userSchema.methods.createPasswordResetToken = async function () {
   const token = crypto.randomBytes(32).toString('hex');
   this.passwordResetToken = crypto
     .createHash('sha256')
     .update(token)
     .digest('hex');
-  this.passwordResetExpires = Date.now() + PASSWORD_EXPIRES_IN ;
+  this.passwordResetExpires = Date.now() + PASSWORD_EXPIRES_IN;
+  await this.save({ validateBeforeSave: false });
   return token;
 };
 

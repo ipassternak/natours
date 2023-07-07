@@ -1,5 +1,6 @@
 'use strict';
 
+const crypto = require('node:crypto');
 const { Schema, model } = require('mongoose');
 
 const bookingSchema = new Schema({
@@ -17,13 +18,25 @@ const bookingSchema = new Schema({
     type: Number,
     required: [true, 'The body must contain price field!'],
   },
+  date: {
+    type: Date,
+    required: [true, 'The body must contain date field!'],
+  },
   createdAt: {
     type: Date,
     default: Date.now,
   },
   paid: {
     type: Boolean,
-    default: true,
+    default: false,
+  },
+  successPaidToken: {
+    type: String,
+    select: false,
+  },
+  cancelPaidToken: {
+    type: String,
+    select: false,
   },
 });
 
@@ -36,6 +49,21 @@ bookingSchema.pre(/^find/, function (next) {
   });
   next();
 });
+
+bookingSchema.methods.generatePaidTokens = async function () {
+  const tokens = [];
+  for (let i = 0; i < 2; i++) {
+    const token = crypto.randomBytes(32).toString('hex');
+    const encrypted = crypto
+      .createHash('sha256')
+      .update(token)
+      .digest('hex');
+    this[!i ? 'successPaidToken' : 'cancelPaidToken'] = encrypted; 
+    tokens.push(token);
+  }
+  await this.save({ validateBeforeSave: false });
+  return tokens;
+};
 
 const Booking = model('Booking', bookingSchema);
 

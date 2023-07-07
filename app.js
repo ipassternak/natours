@@ -2,6 +2,7 @@
 
 const path = require('node:path');
 const express = require('express');
+const compression = require('compression');
 const helmet = require('helmet');
 const cors = require('cors');
 const cookieParser = require('cookie-parser');
@@ -70,6 +71,8 @@ app.use(xss());
 if (process.env.NODE_ENV === 'development') {
   app.use(morgan('dev'));
 }
+
+app.use(compression());
 
 app.use('/', viewRouter);
 app.use('/api/v1/tours', tourRouter);
