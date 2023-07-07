@@ -5,6 +5,7 @@ const Booking = require('../models/bookingModel');
 const Tour = require('../models/tourModel');
 const ControllerFactory = require('./controllerFactory');
 const catchAsync = require('../utils/catchAsync');
+const AppError = require('../utils/appError');
 
 const bookingController = new ControllerFactory(Booking);
 
@@ -14,8 +15,25 @@ const createBooking = bookingController.createOne();
 const updateBooking = bookingController.updateOne();
 const deleteBooking = bookingController.deleteOne();
 
+const checkDisiredDate = async (tour, disiredDate) => {
+  const date = tour.startDates.find(
+    (dates) => dates.date.getTime() === disiredDate
+  );
+  if (!date) 
+    throw new AppError('Invalid tour date!', 400);
+  if (date.participants + 1 > tour.maxGroupSize)
+    throw new AppError('All available spots are taken for this date!', 400);
+  date.participants++;
+  await tour.save();
+};
+
 const getCheckoutSession = catchAsync(async (req, res) => {
-  const tour = await Tour.findById(req.params.tourId);
+  const { tourId, startDate } = req.params;
+  const disiredDate = parseInt(startDate);
+  const tour = await Tour.findById(tourId);
+  await checkDisiredDate(tour, disiredDate);
+  const alreadyBooked = await Booking.findOne({ tour: tourId, user: req.user._id });
+  if (alreadyBooked) throw new AppError('You have already booked this tour!', 400);
   const session = await stripe.checkout.sessions.create({
     payment_method_types: ['card'],
     success_url: `${req.protocol}://${req.get('host')}/?tour=${req.params.tourId}&user=${req.user._id}&price=${tour.price}`,

@@ -43,7 +43,7 @@ block content
       div
         .overview-box__group
           h2.heading-secondary.ma-bt-lg Quick facts
-          - const date = tour.startDates[0].toLocaleString('en-us', { month: 'long', year: 'numeric' })
+          - const date = tour.startDates[0].date.toLocaleString('en-us', { month: 'long', year: 'numeric' })
           +overviewBox('Next date', date, 'calendar')
           +overviewBox('Difficulty', tour.difficulty, 'trending-up')
           +overviewBox('Participants', `${tour.maxGroupSize} people`, 'user')
@@ -85,10 +85,15 @@ block content
       img.cta__img.cta__img--1(src=`/img/tours/${tour.images[0]}`, alt='Tour picture')
       img.cta__img.cta__img--2(src=`/img/tours/${tour.images[1]}`, alt='Tour picture')
       .cta__content
-        h2.heading-secondary What are you waiting for?
-        p.cta__text= `${tour.duration} days. 1 adventure. Infinite memories. Make it yours today!`
-
-        if (user)
-          button.btn.btn--green.span-all-rows#book-tour(data-tour-id=`${tour._id}`) Book tour now!
-        else
-          a.btn.btn--green.span-all-rows(href='/login') Log in to book tour  
+        if (booking)
+          h3.heading-secondary You have already booked this tour!
+        else  
+          h2.heading-secondary What are you waiting for?
+          p.cta__text= `${tour.duration} days. 1 adventure. Infinite memories. Make it yours today!`
+          if (user)
+            each startDate in tour.startDates
+              - const { date } = startDate;
+              - const data = `${tour._id}/${date.getTime()}`;
+              button.btn.btn--green.book-tour(data-booked-tour=`${data}`) Book for #{date.toLocaleString('en-us', { month: 'long', year: 'numeric' })}
+          else
+            a.btn.btn--green.span-all-rows(href='/login') Log in to book tour  

@@ -194,6 +194,8 @@ body {
   font-weight: 400;
   -webkit-backface-visibility: hidden;
   backface-visibility: hidden;
+  margin: 10px;
+  max-width: 300px;
   /*Add later when we use this for the button in form*/
   border: none;
   cursor: pointer;
@@ -691,7 +693,7 @@ body {
 
 .cta {
   position: relative;
-  max-width: 105rem;
+  max-width: 110rem;
   margin: 0 auto;
   overflow: hidden;
   background-color: #fff;
@@ -751,11 +753,7 @@ body {
 }
 
 .cta__content {
-  display: grid;
-  grid-template-rows: auto auto;
-  grid-template-columns: 1fr auto;
-  grid-gap: 0.7rem;
-  grid-auto-flow: column;
+  display: inline-block;
   -webkit-box-align: center;
   -ms-flex-align: center;
   align-items: center;

@@ -4,6 +4,7 @@ const Tour = require('../models/tourModel');
 const catchAsync = require('../utils/catchAsync');
 const AppError = require('../utils/appError');
 const { PAGE_ALERTS } = require('../constants/appConstants');
+const Booking = require('../models/bookingModel');
 
 const getAlert = (req, res, next) => {
   const { alert } = req.query;
@@ -25,10 +26,15 @@ const getTour = catchAsync(async (req, res) => {
     path: 'reviews',
     select: 'content rating user',
   });
+  const booking = await Booking.exists({ 
+    tour: tour._id, 
+    user: res.locals.user._id 
+  });
   if (!tour) throw new AppError('Tour not found!', 404);
   res.status(200).render('tour', { 
     title: `${tour.name} Tour`, 
-    tour 
+    tour,
+    booking,
   });
 });
 

@@ -14,7 +14,7 @@ const photoField = document.getElementById('photo');
 const currenPasswordField = document.getElementById('password-current');
 const passwordField = document.getElementById('password');
 const passwordConfirmField = document.getElementById('password-confirm');
-const bookBtn = document.getElementById('book-tour');
+const bookBtns = document.querySelectorAll('.btn.btn--green.book-tour');
 
 const sumbitBtn = document.querySelector('.btn.btn--green');
 const logoutBtn = document.querySelector('.nav__el.nav__el--logout');
@@ -29,10 +29,11 @@ if (signupForm) {
   const fields = [nameField, emailField, passwordField, passwordConfirmField];
   signupForm.addEventListener('submit', async (ev) => {
     ev.preventDefault();
+    const { textContent } = sumbitBtn;
     sumbitBtn.textContent = 'Submitting...';
     await signup(...getValues(fields));
     fields.forEach((field) => field.value = '');
-    sumbitBtn.textContent = 'Sign up';
+    sumbitBtn.textContent = textContent;
   });
 }
 
@@ -40,10 +41,11 @@ if (loginForm) {
   const fields = [emailField, passwordField];
   loginForm.addEventListener('submit', async (ev) => {
     ev.preventDefault();
+    const { textContent } = sumbitBtn;
     sumbitBtn.textContent = 'Submitting...';
     await login(...getValues(fields));
     removeValues(fields);
-    sumbitBtn.textContent = 'Log in';
+    sumbitBtn.textContent = textContent;
   });
 }
 
@@ -70,24 +72,26 @@ if (changePasswordForm) {
   ];
   changePasswordForm.addEventListener('submit', async (ev) => {
     ev.preventDefault();
+    const { textContent } = changePasswordBtn;
     changePasswordBtn.textContent = 'Updating...';
     const currentPassword = currenPasswordField.value;
     const password = passwordField.value;
     const passwordConfirm = passwordConfirmField.value;
     await changePassword({ currentPassword, password, passwordConfirm });
-    changePasswordBtn.textContent = 'Change password';
+    changePasswordBtn.textContent = textContent;
     removeValues(fields);
   });
 }
 
-if (bookBtn) {
-  bookBtn.addEventListener('click', async (ev) => {
+if (bookBtns) {
+  bookBtns.forEach((btn) => btn.addEventListener('click', async (ev) => {
     ev.preventDefault();
-    bookBtn.textContent = 'Processing...';
-    const { tourId } = bookBtn.dataset;
-    await bookTour(tourId);
-    bookBtn.textContent = 'Book tour now!';
-  });
+    const { textContent } = btn;
+    btn.textContent = 'Processing...';
+    const { bookedTour } = btn.dataset;
+    await bookTour(bookedTour);
+    btn.textContent = textContent;
+  }));
 }
 
 if (alertMessage) displayAlert('success', alertMessage);
