@@ -34,7 +34,7 @@ DB_TOKEN=
 
   
 
-3. Fill environment variables related to JWT:
+3. Fill in environment variables related to JWT:
 
 ```plaintext
 
@@ -46,7 +46,7 @@ JWT_EXPIRES_IN=<number of days>
 
   
 
-4. You can generate `JWT_SECTER` using `node:crypto` module:
+4. You can generate a `JWT_SECTER` using `node:crypto` module:
 
 ```javascript
 
@@ -64,7 +64,7 @@ console.log(crypto.randomBytes(16).toString('hex'));
 
   
 
-6. Fill environment variables related to `Nodemailer`:
+6. Fill in environment variables related to `Nodemailer`:
 
 ```plaintext
 
