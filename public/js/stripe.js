@@ -1,8 +1,6 @@
 import { displayAlert } from './alerts';
 
-const stripe = Stripe(
-  'pk_test_51NPnPRGUzfLf8x9WCicqji93UXZkxvn4FCJvq2z23y43MsV5kaH1vIzF8qebLOh6Q1Zmj850AFW0n4ByONewy96R00CFfOp14h'
-);
+const stripe = Stripe('');
 
 export const bookTour = async (bookedTour) => {
   try {
