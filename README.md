@@ -110,7 +110,7 @@ const  stripe = Stripe('<your public key>');
 
   
 
-*Note: The `npm run reload:dev` works only if your NODE_ENV in your `.env` file set to `development`*
+*Note: The `npm run reload:dev` works only if your `NODE_ENV` in your `.env` file set to `development`*
 
   
 
@@ -120,7 +120,7 @@ const  stripe = Stripe('<your public key>');
 
   
 
-15. If you want to test production mode, change NODE_ENV variable to `production` in your env file.
+15. If you want to test production mode, change `NODE_ENV` variable to `production` in your env file.
 
   
 
