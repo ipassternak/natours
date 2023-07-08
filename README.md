@@ -128,5 +128,7 @@ const  stripe = Stripe('<your public key>');
 
   
 
-16. To try **Natours** API in Postman go to `https://documenter.getpostman.com/view/27884369/2s93zH1JfS` and click `Run in Postman` button. 
+16. To try **Natours** API in Postman go to [Natours API](https://documenter.getpostman.com/view/27884369/2s93zH1JfS) and click `Run in Postman` button. 
 **There is a simple documentation to all endpoints.**
+
+17. To debug application use `npm run debug` command.
